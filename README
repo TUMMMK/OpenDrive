@@ -1,1 +1,26 @@
-This repository is still under construction. We hope to publish the first version of the OpenDrive simulator by the end of September. If you want to receive a notification once we have uploaded the initial version, please send an email to simon.schenk@tum.de
+This projects aims at creating a fully functional driving simulator based on the open world video game GTA V.
+Since the whole program is essentially a modification of GTA V, 'ScriptHookV' and 'ScriptHookDotNet' is required.
+
+'ScirptHookV' can be downloaded at http://www.dev-c.com/gtav/scripthookv/
+'ScriptHookDotNet' can be downloaded at https://github.com/crosire/scripthookvdotnet
+
+Furthermore, the modification 'Aikido Free Cam' is required, which can be downloaded at https://de.gta5-mods.com/scripts/aikido-free-cam/download
+
+In order to install the OpenDriveSimulator mod, several steps are required:
+1) Download and install the three required mods, first. Make sure to also compile the .dll of the ScriptHookDotNet mod, in order to use it as C# Reference.
+2) Change the 'Toggle Key' in the FreeCam.ini to 'F8'
+3) Change the 'rootFolder' and 'loggingPath' entries of the settings.cfg file in the 'ConfigFile/OpenDriveSim' folder to your choice
+4) Copy the 'OpenDriveSim' folder from the 'ConfigFile' folder to the 'GTA V/scripts' folder
+5) Build the project and copy all created binaries (.ddl) into the 'GTA V/scripts' folder
+6) Start the game
+
+Some further recommendation are:
+1) Download a 100% safegame to get rid of ingame messages and the ingame smartphone appearing
+2) Download a mod for more realistic driving physics
+
+Controls:
+When everything is installed correctly, a menu should appear after starting the game and loading a safegame.
+At this point, the F12 key can be pressed in order to show a help menu at the top left of the screen.
+
+Further notes:
+This mod has been tested using the game version 1.33
