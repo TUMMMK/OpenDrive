@@ -11,7 +11,7 @@ In order to install the OpenDriveSimulator mod, several steps are required:
 2) Change the 'Toggle Key' in the FreeCam.ini to 'F8'
 3) Change the 'rootFolder' and 'loggingPath' entries of the settings.cfg file in the 'ConfigFile/OpenDriveSim' folder to your choice
 4) Copy the 'OpenDriveSim' folder from the 'ConfigFile' folder to the 'GTA V/scripts' folder
-5) Build the project and copy all created binaries (.ddl) into the 'GTA V/scripts' folder
+5) Build the project and copy all created binaries (.dll) into the 'GTA V/scripts' folder
 6) Start the game
 
 Some further recommendation are:
