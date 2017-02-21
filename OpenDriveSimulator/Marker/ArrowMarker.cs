@@ -40,18 +40,22 @@ namespace OpenDriveSimulator.Marker
       static readonly Vector3 c_scale = new Vector3(2, 2, 2);
       static readonly Color c_color = Color.Red;
 
+      public ArrowMarker()
+      {
+      }
+
       public override void Delete()
       {
       }
 
       public override void Draw()
       {
-         Direction.Normalize();
-         var pos = new Vector3(Position.X, Position.Y, World.GetGroundHeight(Position) + 1.5f);
-         var dir = new Vector3(Direction.X, Direction.Y, 0);
-         dir.Normalize();
+         var Direction3D = new Vector3(Direction.X, Direction.Y, 0);
+         Direction3D.Normalize();
+         var drawingPosition = Position;
+         drawingPosition.Z += 1.5f;
 
-         World.DrawMarker(c_marker, pos, dir, c_rotation, c_scale, c_color);  // drawing the markers at the positions given in resampled
+         World.DrawMarker(c_marker, drawingPosition, Direction3D, c_rotation, c_scale, c_color);  // drawing the markers at the positions given in resampled
       }
    }
 }

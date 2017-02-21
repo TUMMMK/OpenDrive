@@ -32,8 +32,22 @@ namespace OpenDriveSimulator.Marker
 {
    abstract class MarkerBase
    {
-      public Vector2 Position { get; set; } = new Vector2();
+      public Vector3 Position { get; set; } = new Vector3();
       public Vector2 Direction { get; set; } = new Vector2();
+
+      public bool SetToGround
+      {
+         get { return m_setToGround; }
+         set
+         {
+            if (value != m_setToGround)
+               m_updateObject = true;
+            m_setToGround = value;
+         }
+      }
+      bool m_setToGround = true;
+      protected bool m_updateObject = true;
+
 
       public abstract void Draw();
       public abstract void Delete();

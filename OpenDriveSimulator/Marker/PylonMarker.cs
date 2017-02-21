@@ -33,34 +33,13 @@ using GTA.Math;
 
 namespace OpenDriveSimulator.Marker
 {
-   class PylonMarker : MarkerBase
+   class PylonMarker : PropertyBasedMarker
    {
-      Prop m_pylon = null;
-      const int c_modelHash = 546252211;
-
-      public override void Delete()
+      protected override int ModelHash
       {
-         if (m_pylon == null)
-            return;
-
-         if (m_pylon.Exists())
+         get
          {
-            m_pylon.Delete();
-            m_pylon = null;
-         }
-      }
-      public override void Draw()
-      {
-         if (m_pylon == null)
-         {
-            var pos = new Vector3(Position.X, Position.Y, World.GetGroundHeight(Position));
-            var rot = new Vector3(0, 0, (float)(Math.Atan(Direction.Y / Direction.X) / Math.PI * 180));
-
-            m_pylon = World.CreateProp(new Model(c_modelHash), pos, rot, false, true);
-            if (m_pylon.Exists())
-            {
-               m_pylon.IsPositionFrozen = true;
-            }
+            return 546252211;
          }
       }
    }
