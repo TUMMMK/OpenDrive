@@ -115,7 +115,7 @@ namespace OpenDriveSimulator.Scripting
             else
                updateRenderingMarkers = true;
 
-            Application.Console.WriteLine("[DMScipt]: update needed is " + updateRenderingMarkers.ToString());
+            Application.Console.WriteLine("[DMScript]: update needed is " + updateRenderingMarkers.ToString());
             m_currentMarkerType = value;
             if (updateRenderingMarkers)
             {
@@ -151,6 +151,8 @@ namespace OpenDriveSimulator.Scripting
 
       void drawMarkers()
       {
+         updateMarkerPositions();
+
          Vector2 playerPos = new Vector2(Game.PlayerPed.Position.X, Game.PlayerPed.Position.Y);
          foreach (var midpoint in m_renderingMarkers.Keys)
          {
@@ -170,7 +172,8 @@ namespace OpenDriveSimulator.Scripting
             }
          }
       }
-      void updateMarkers()
+
+   void updateMarkers()
       {
          Application.Console.WriteLine("[DMScript.updateMarker]: Deleting old markers");
          int oldMarkerCount = 0;
@@ -216,12 +219,13 @@ namespace OpenDriveSimulator.Scripting
          foreach (var midpoint in coordiantes.Keys)
          {
             List<MarkerBase> markerList = new List<MarkerBase>();
-            var coordList = coordiantes[midpoint];
+            var coordList = coordiantes[midpoint].Select(x => Tools.ConvertToVector3(x)).ToList();
             for (int i = 0; i < coordList.Count - 1; i++)
             {
-               Vector2 pos = coordList[i];
-               Vector2 dir = coordList[i + 1] - pos;
-
+               var pos = coordList[i];
+               var diff = coordList[i + 1] - pos;
+               var dir = new Vector2(diff.X, diff.Y);
+               dir.Normalize();
                switch (m_currentMarkerType)
                {
                   case MarkerType.Arrow:
@@ -236,6 +240,58 @@ namespace OpenDriveSimulator.Scripting
                }
             }
             m_renderingMarkers.Add(midpoint, markerList);
+         }
+      }
+      const float c_heightThreshold = 2.0f;
+      private void updateMarkerPositions()
+      {
+         Vector2 playerPos = new Vector2(Game.PlayerPed.Position.X, Game.PlayerPed.Position.Y);
+         foreach (var marker in m_renderingMarkers.Where(x => x.Key.DistanceTo(playerPos) <= c_renderingThreshold).Select(x => x.Value))
+         {
+            var list = marker.Select(x => x.Position).ToList();
+
+            int interpolationStartIndex = 0;
+            bool interplolating = false;
+            for (int i = 1; i < list.Count; i++)
+            {
+               var lastHeight = list[i - 1].Z;
+               var currentHeight = list[i].Z;
+
+               if (lastHeight == 0 || currentHeight == 0)
+                  continue;
+
+               if (Math.Abs(currentHeight - lastHeight) > c_heightThreshold)
+               {
+                  if (!interplolating)
+                  {
+                     interpolationStartIndex = i - 1;
+                     Application.Console.WriteLine("Height jump detected. Interpolating from index " + interpolationStartIndex);
+                     Application.Console.WriteLine("Height difference is " + Math.Abs(currentHeight - lastHeight) + " (from " + lastHeight + " to " + currentHeight + ")");
+                     interplolating = true;
+                  }
+                  else
+                  {
+                     if (i < list.Count - 1)
+                        i++;
+                     int interpolationCount = i - interpolationStartIndex;
+                     float interpolationFactor = 1.0f / (float)(interpolationCount + 1);
+                     float startZValue = list[interpolationStartIndex].Z;
+                     float endZValue = list[i].Z;
+                     Application.Console.WriteLine("to index " + i + ". Start height is " + startZValue + "; end height is " + endZValue + ". Interpolating " + interpolationCount + " values");
+
+                     for (int j = 0; j <= interpolationCount; j++)
+                     {
+                        var vector = list[interpolationStartIndex + j];
+                        vector.Z = (float)((interpolationCount - j) * startZValue + j * endZValue) / (float)interpolationCount;
+                        marker[interpolationStartIndex + j].Position = vector;
+                        marker[interpolationStartIndex + j].SetToGround = false;
+
+                        Application.Console.WriteLine("setting index " + (interpolationStartIndex + j) + " to " + vector.Z);
+                     }
+                     interplolating = false;
+                  }
+               }
+            }
          }
       }
    }
