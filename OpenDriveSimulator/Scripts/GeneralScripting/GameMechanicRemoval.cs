@@ -35,6 +35,11 @@ namespace OpenDriveSimulator.Scripting
 {
    class GameMechanicRemoval : SimScriptBase
    {
+      public GameMechanicRemoval()
+      {
+         Interval = 100;
+      }
+
       protected override void OnAbort(object sender, EventArgs e)
       {
       }
