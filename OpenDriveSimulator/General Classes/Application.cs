@@ -70,7 +70,8 @@ namespace OpenDriveSimulator
       {
          { "Normal", VehicleHash.Blista2 },
          { "Fast", VehicleHash.Comet2 },
-         { "Slow", VehicleHash.Minivan2 }
+         { "Slow", VehicleHash.Minivan2 },
+         { "Experimental", VehicleHash.Dump }
       };
       public static List<string> AvailableWeathers { get; } = Enum.GetNames(typeof(GTA.Weather)).ToList();
       public static List<string> AvailableDaytimes { get; } = new List<string>() { "Midday", "Sunrise", "Sunset", "Night" };
