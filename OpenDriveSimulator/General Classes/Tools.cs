@@ -32,6 +32,7 @@ using System.Globalization;
 using System.Linq;
 
 using GTA;
+using GTA.Math;
 
 using OpenDriveSimulator.Scripting;
 
@@ -52,7 +53,7 @@ namespace OpenDriveSimulator
          return new SizeF(original.Width * ScaleFactor, original.Height * ScaleFactor);
       }
 
-      public static GTA.Math.Vector3 ConvertToVector3(string s)
+      public static Vector3 ConvertToVector3(string s)
       {
          var splittet = s.Split(',');
          var x = (float)Convert.ToDouble(splittet[0], CultureInfo.InvariantCulture);
@@ -60,12 +61,16 @@ namespace OpenDriveSimulator
          var z = (float)Convert.ToDouble(splittet[2], CultureInfo.InvariantCulture);
          return new GTA.Math.Vector3(x, y, z);
       }
-      public static GTA.Math.Vector2 ConvertToVector2(string s)
+      public static Vector2 ConvertToVector2(string s)
       {
          var splittet = s.Split(',');
          var x = (float)Convert.ToDouble(splittet[0], CultureInfo.InvariantCulture);
          var y = (float)Convert.ToDouble(splittet[1], CultureInfo.InvariantCulture);
          return new GTA.Math.Vector2(x, y);
+      }
+      public static Vector3 ConvertToVector3(Vector2 vec)
+      {
+         return new Vector3(vec.X, vec.Y, World.GetGroundHeight(vec));
       }
 
       internal static void SetCamera(GTA.Math.Vector3 Position, GTA.Math.Vector3 Direction, float FOV)
