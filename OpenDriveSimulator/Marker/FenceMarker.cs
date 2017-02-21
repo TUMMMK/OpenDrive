@@ -33,7 +33,7 @@ using GTA.Math;
 
 namespace OpenDriveSimulator.Marker
 {
-   class FenceMarker : MarkerBase
+   class FenceMarker : PropertyBasedMarker
    {
       protected override int ModelHash
       {
