@@ -46,6 +46,8 @@ namespace OpenDriveSimulator.Scripting
 
       public Vector3 ControlledPosition { get; set; } = new Vector3();
       public Vector3 ControlledDirection { get; set; } = new Vector3();
+      public Vector3 FreemodePosition { get; set; } = new Vector3();
+
       public float ControlledFOV { get; set; } = 90.0f;
 
       public Vehicle CarToFollow { get; set; }
@@ -132,6 +134,7 @@ namespace OpenDriveSimulator.Scripting
 
                   //if ((uint)CarToFollow.Model.Hash == (uint)VehicleHash.Adder)
                   //   vehicle_offset = vehicle_offset * 0.65f;
+                  vehicle_offset += new Vector3(0,0,2);
 
                   m_controlledCamera.Position = CarToFollow.Position + CarToFollow.ForwardVector + vehicle_offset;
                   m_controlledCamera.Rotation = CarToFollow.Rotation;
@@ -208,6 +211,7 @@ namespace OpenDriveSimulator.Scripting
       void FromVehicleToFree()
       {
          Application.Console.WriteLine("[Camera]: Going from Vehicle to Free");
+         m_freeCamera.Position = FreemodePosition;
          World.RenderingCamera = m_freeCamera;
          Application.Console.WriteLine("[Camera Delayed]: Camera ID is " + World.RenderingCamera.NativeValue);
 
@@ -222,6 +226,7 @@ namespace OpenDriveSimulator.Scripting
       void FromFixedToFree()
       {
          Application.Console.WriteLine("[Camera]: Going from Fixed to Free");
+         m_freeCamera.Position = FreemodePosition;
          World.RenderingCamera = m_freeCamera;
          Application.Console.WriteLine("[Camera Delayed]: Camera ID is " + World.RenderingCamera.NativeValue);
 
