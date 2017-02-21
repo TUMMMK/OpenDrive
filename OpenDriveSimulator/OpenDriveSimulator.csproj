@@ -70,6 +70,7 @@
     <Compile Include="General Classes\Dispatcher.cs" />
     <Compile Include="General Classes\KeyMapping.cs" />
     <Compile Include="Marker\ArrowMarker.cs" />
+    <Compile Include="Marker\PropertyBasedMarker.cs" />
     <Compile Include="Marker\PylonMarker.cs" />
     <Compile Include="Marker\MarkerBase.cs" />
     <Compile Include="Marker\FenceMarker.cs" />
