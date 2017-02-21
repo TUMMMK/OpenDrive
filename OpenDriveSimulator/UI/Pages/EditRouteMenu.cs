@@ -39,8 +39,10 @@ namespace OpenDriveSimulator.UI.Pages
 {
    internal class EditRouteMenu
    {
-      static List<Barrier> barriers;
-      static List<Barrier> tempBarriers;
+      // the updated list of barriers (deleted barriers not included)
+      static List<Barrier> barriers { get; set; }
+      // the updated list of barriers (including deleted barriers)
+      static List<Barrier> tempBarriers { get; set; }
       static Barrier currentBarrier;
 
       static Vector3 spawnPosition;
@@ -110,14 +112,16 @@ namespace OpenDriveSimulator.UI.Pages
          previewDirection = route.PreviewCameraDirection;
          spawnPosition = route.SpawnPosition;
          spawnRotation = route.SpawnRotation;
-         barriers = new List<Barrier>();
-         barriers.AddRange(route.Barriers);
 
          tempBarriers = new List<Barrier>();
-         tempBarriers.AddRange(barriers);
+         tempBarriers.AddRange(route.Barriers);
+
+         barriers = new List<Barrier>();
+         barriers.AddRange(tempBarriers);
+
 
          MarkerScript = Application.GetScript<DrawMarkerScript>();
-         MarkerScript.Markers = tempBarriers;
+         MarkerScript.Markers = barriers;
          MarkerScript.Start();
 
          barrierIndex = 0;
@@ -187,7 +191,7 @@ namespace OpenDriveSimulator.UI.Pages
             ScaledWidth = 700,
             ScaledHeight = 7 * ItemList.C_ItemHeight + 10,
          };
-         barriers.ForEach(x => availableBarriersList.AddItem("Barrier" + barrierIndex++));
+         tempBarriers.ForEach(x => availableBarriersList.AddItem("Barrier" + barrierIndex++));
          availableBarriersList.AddItem("<create new>");
          availableBarriersList.Selected += EditBarrier;
 
@@ -492,6 +496,7 @@ namespace OpenDriveSimulator.UI.Pages
 
          var Camera = Application.GetScript<CameraScript>();
          Camera.SetMode(CameraScript.CameraMode.Fixed);
+         Application.ExecutionQueue.AddAction(2, () => Camera.ControlledPosition = (previewPosition != null) ? previewPosition : Application.DefaultCameraPosition);
       }
 
       private static void SaveBarrier(object sender, EventArgs e)
@@ -550,6 +555,7 @@ namespace OpenDriveSimulator.UI.Pages
 
          var Camera = Application.GetScript<CameraScript>();
          Camera.SetMode(CameraScript.CameraMode.Fixed);
+         Application.ExecutionQueue.AddAction(2, () => Camera.ControlledPosition = (previewPosition != null) ? previewPosition : Application.DefaultCameraPosition);
 
          updateTempBarriers();
       }
@@ -587,6 +593,7 @@ namespace OpenDriveSimulator.UI.Pages
 
          var Camera = Application.GetScript<CameraScript>();
          Camera.SetMode(CameraScript.CameraMode.Fixed);
+         Application.ExecutionQueue.AddAction(2, () => Camera.ControlledPosition = (previewPosition != null) ? previewPosition : Application.DefaultCameraPosition);
 
          updateTempBarriers();
       }
@@ -613,23 +620,41 @@ namespace OpenDriveSimulator.UI.Pages
          deleteBarrierButton.Show();
          applyBarrierButton.Show();
 
-         if ((sender as Button).Content == "<create new>")
+         Vector3 cameraPosition;
+
+         string SelectedName = (sender as Button).Content;
+         if (SelectedName == "<create new>")
          {
             Application.Console.WriteLine("[EB.EditBarrier]: <create new> pressed; creating new barrier with index " + barrierIndex);
             currentBarrier = new Barrier();
             barrierNameLabel.Content = "Barrier" + (barrierIndex);
+            int indexInList = availableBarriersList.ListItems.IndexOf(SelectedName);
+            if (indexInList == 0)
+            {
+               cameraPosition = spawnPosition;
+            }
+
+            else
+            {
+               int index = Convert.ToInt32(availableBarriersList.ListItems[indexInList - 1].Substring(7));
+               cameraPosition = Tools.ConvertToVector3(tempBarriers[index].Midpoint);
+            }
          }
          else
          {
             Application.Console.WriteLine("[EB.EditBarrier]: Editing existing barrier \"" + (sender as Button).Content + "\".");
             string entryName = (sender as Button).Content;
             int barrierNumber = Convert.ToInt32(entryName.Substring(7));
-            currentBarrier = barriers[barrierNumber];
+            currentBarrier = tempBarriers[barrierNumber];
             barrierNameLabel.Content = entryName;
+            cameraPosition = Tools.ConvertToVector3(currentBarrier.Midpoint);
          }
 
+
          var Camera = Application.GetScript<CameraScript>();
-         Camera.SetMode(CameraScript.CameraMode.Free);
+
+         Camera.ControlledPosition = cameraPosition;
+         Application.ExecutionQueue.AddAction(2, () => Camera.SetMode(CameraScript.CameraMode.Free));
          Application.Console.WriteLine("[EB.EditBarrier]: set camera to fixed mode");
       }
 
@@ -681,6 +706,7 @@ namespace OpenDriveSimulator.UI.Pages
 
          var Camera = Application.GetScript<CameraScript>();
          Camera.SetMode(CameraScript.CameraMode.Fixed);
+         Application.ExecutionQueue.AddAction(2, () => Camera.ControlledPosition = (previewPosition != null) ? previewPosition : Application.DefaultCameraPosition);
       }
 
       private static void AbortSpawnSelection(object sender, EventArgs e)
@@ -702,6 +728,7 @@ namespace OpenDriveSimulator.UI.Pages
 
          var Camera = Application.GetScript<CameraScript>();
          Camera.SetMode(CameraScript.CameraMode.Fixed);
+         Application.ExecutionQueue.AddAction(2, () => Camera.ControlledPosition = (previewPosition != null) ? previewPosition : Application.DefaultCameraPosition);
       }
 
       private static void ApplyPreviewSelection(object sender, EventArgs e)
@@ -750,6 +777,7 @@ namespace OpenDriveSimulator.UI.Pages
 
          var Camera = Application.GetScript<CameraScript>();
          Camera.SetMode(CameraScript.CameraMode.Fixed);
+         Application.ExecutionQueue.AddAction(2, () => Camera.ControlledPosition = (previewPosition != null) ? previewPosition : Application.DefaultCameraPosition);
       }
 
       private static void SelectPreview(object sender, EventArgs e)
@@ -771,6 +799,7 @@ namespace OpenDriveSimulator.UI.Pages
 
          var Camera = Application.GetScript<CameraScript>();
          Camera.SetMode(CameraScript.CameraMode.Free);
+         Application.ExecutionQueue.AddAction(2, () => Camera.ControlledPosition = (previewPosition != null) ? previewPosition : Application.DefaultCameraPosition);
       }
 
       private static void SelectSpawn(object sender, EventArgs e)
@@ -792,6 +821,7 @@ namespace OpenDriveSimulator.UI.Pages
 
          var Camera = Application.GetScript<CameraScript>();
          Camera.SetMode(CameraScript.CameraMode.Free);
+         Application.ExecutionQueue.AddAction(2, () => Camera.ControlledPosition = (previewPosition != null) ? previewPosition : Application.DefaultCameraPosition);
       }
 
       private static void ApplyChanges(Route oldRoute)
